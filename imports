@@ -1,0 +1,7 @@
+import java.util.Map
+
+import com.hazelcast.core._
+import com.hazelcast.map._
+
+import collection.JavaConverters._
+
