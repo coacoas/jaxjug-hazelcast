@@ -1,0 +1,4 @@
+instance.shutdown
+
+val instance = Hazelcast.newHazelcastInstance
+val m = instance.getMap[Int, String]("data")

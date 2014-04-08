@@ -1,0 +1,10 @@
+m.put(1, "London")
+m.put(2, "Tokyo")
+m.put(3, "Jacksonville")
+m.put(4, "Paris")
+m.put(5, "Charlottesville")
+try { 
+  m.put(6, "Constantinople");
+} catch {
+  case e: Exception => System.out.println(e.getMessage());
+}

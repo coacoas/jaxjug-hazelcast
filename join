@@ -1,0 +1,4 @@
+import com.hazelcast.config.Config
+import com.hazelcast.core.Hazelcast
+
+val instance = Hazelcast.newHazelcastInstance

@@ -1,0 +1,8 @@
+import com.hazelcast.config.Config
+import com.hazelcast.core.Hazelcast
+
+val config = new Config
+config.getGroupConfig.setName("JaxJUG")
+config.getGroupConfig.setPassword("Hazelcast")
+
+val instance = Hazelcast.newHazelcastInstance(config)
