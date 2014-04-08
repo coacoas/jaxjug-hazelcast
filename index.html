@@ -51,6 +51,65 @@
 				</section>
 
 				<section>
+					<section>
+						<p class="title">Maps</p>
+						<pre><code>
+import java.util.HashMap;
+import java.util.Map;
+
+public class Lookup { 
+  public static void main(String[] args) { 
+    Map&lt;Integer, String> m = new HashMap&lt;>();
+
+    m.put(1, "London");
+    m.put(2, "Tokyo");
+
+    m.get(1);  // "London"
+  }
+}
+						</code>
+						</pre>
+					</section>
+					<section>
+						<p class="title">Thread-safe Maps</p>
+												<pre><code>
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+
+public class Lookup { 
+  public static void main(String[] args) { 
+    Map&lt;Integer, String> m = new ConcurrentHashMap&lt;>();
+
+    m.put(1, "London");
+    m.put(2, "Tokyo");
+
+    m.get(1);  // "London"
+  }
+}
+						</code>
+						</pre>
+
+					</section>
+					<section>
+						<p class="title">Distrubuted Maps</p>
+												<pre><code>
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+
+public class Lookup { 
+  public static void main(String[] args) { 
+    Map&lt;Integer, String> m = new ConcurrentHashMap&lt;>();
+
+    m.put(1, "London");
+    m.put(2, "Tokyo");
+
+    m.get(1);  // "London"
+  }
+}
+						</code>
+						</pre>
+
+					</section>
                 </section>
 
 			</div>
