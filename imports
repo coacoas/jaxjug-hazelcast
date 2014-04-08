@@ -2,6 +2,9 @@ import java.util.Map
 
 import com.hazelcast.core._
 import com.hazelcast.map._
+import com.hazelcast.config.Config
 
 import collection.JavaConverters._
 
+import Demo._
+import Demo.Implicits._
