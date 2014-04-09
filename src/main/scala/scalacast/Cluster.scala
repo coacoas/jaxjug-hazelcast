@@ -6,7 +6,7 @@ import java.util.{ Map => JUMap }
 import java.util.concurrent.Callable
 import com.hazelcast.query.SqlPredicate
 
-class Listener[K, V] extends EntryListener[K, V] { 
+class Listener[K <: AnyRef, V <: AnyRef] extends EntryListener[K, V] { 
   override def entryAdded(e: EntryEvent[K, V]) =
     println(s"Added (${e.getKey}, ${e.getValue}")
   override def entryEvicted(e: EntryEvent[K, V]) =

@@ -9,6 +9,7 @@ import com.hazelcast.query.SqlPredicate;
 import com.hazelcast.transaction.TransactionContext;
 
 public class Data {
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws InterruptedException {
 		HazelcastInstance instance = Hazelcast.newHazelcastInstance();
 		IMap<Integer, String> m = instance.getMap("data");

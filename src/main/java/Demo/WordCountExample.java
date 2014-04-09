@@ -4,10 +4,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Files;
+import com.hazelcast.config.Config;
 import com.hazelcast.core.ExecutionCallback;
+import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
 import com.hazelcast.mapreduce.Job;
@@ -16,8 +21,14 @@ import com.hazelcast.mapreduce.JobTracker;
 import com.hazelcast.mapreduce.KeyValueSource;
 
 public class WordCountExample {
+	private final HazelcastInstance instance; 
 	
-	public void load(HazelcastInstance instance) throws IOException {
+	
+	public WordCountExample(HazelcastInstance instance) {
+		this.instance = instance;
+	}
+
+	public void load() throws IOException {
 		IMap<String, String> data = instance.getMap("files");
 		addFile(data, new File("data/f1.txt"));
 		addFile(data, new File("data/f2.txt"));
@@ -29,7 +40,7 @@ public class WordCountExample {
 		data.put(file.getPath(), Files.toString(file, Charsets.UTF_8));
 	}
 
-	public void mapreduce(HazelcastInstance instance) throws InterruptedException, ExecutionException {
+	public JobCompletableFuture<Map<String, Long>> mapreduce() throws InterruptedException, ExecutionException {
 		JobTracker tracker = instance.getJobTracker("word-count");
 		IMap<String, String> data = instance.getMap("files");
 		KeyValueSource<String, String> source = KeyValueSource.fromMap(data);
@@ -52,7 +63,22 @@ public class WordCountExample {
 				for (Map.Entry<String, Long> words : arg0.entrySet()) {
 					System.out.println(words.getKey() + " -> " + words.getValue());
 				}
-			}});		
+			}});	
+		return future;	
 	}
 
+	public static void main(String[] args) throws IOException, InterruptedException, ExecutionException, TimeoutException { 
+		Config config = new Config();
+		config.getGroupConfig().setName("mapreduce");
+		config.getGroupConfig().setPassword("hazelcast");
+		config.getManagementCenterConfig().setEnabled(false);
+		
+		HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
+		WordCountExample wc = new WordCountExample(instance);
+		wc.load();
+		Future<Map<String, Long>> result = wc.mapreduce();
+		
+		System.out.println(result.get(10, TimeUnit.SECONDS).entrySet());
+		instance.shutdown();		
+	}
 }

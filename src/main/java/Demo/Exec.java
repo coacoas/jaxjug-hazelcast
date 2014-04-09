@@ -1,7 +1,6 @@
 package Demo;
 
 import java.util.Map.Entry;
-import java.util.concurrent.Callable;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -22,6 +21,8 @@ public class Exec {
 		}
 		
 		m.executeOnKey(1, new AbstractProcessor<Integer, String>() {
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Object process(Entry<Integer, String> arg0) {
 				String newValue = arg0.getValue().toUpperCase();
