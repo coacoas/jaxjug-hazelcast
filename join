@@ -1,4 +1,8 @@
 import com.hazelcast.config.Config
 import com.hazelcast.core.Hazelcast
 
-val instance = Hazelcast.newHazelcastInstance
+val config = new Config
+config.getManagementCenterConfig.setUrl("http://localhost:8080/mancenter")
+config.getManagementCenterConfig.setEnabled(true)
+val instance = Hazelcast.newHazelcastInstance(config)
+val m = instance.getMap[Int, String]("data")

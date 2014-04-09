@@ -1,0 +1,11 @@
+In computing, Hazelcast is an in-memory Open Source data grid based on Java. By having multiple nodes form a cluster, data is evenly distributed among the nodes. This allows for horizontal scalability both in terms of available storage space and processing power. Backups are also distributed in a similar fashion to other nodes, based on configuration, thereby protecting against single node failure.
+Typical use-cases for Hazelcast:
+Cache frequently accessed data in-memory, often in front of a database
+Store temporal data like web sessions
+In-memory data processing/analytics
+Memcached alternative with protocol compatible interface[1]
+Cross-JVM communication/shared storage
+Hazelcast is often used as an underlying library or system onto which other higher level features are built, with examples like:
+Vert.x utilizes it for shared storage[2]
+Underlying MapReduce framework/executor[3]
+In 2012 Gartner selected the company named Hazelcast as a "Cool Vendor",[4] and in 2013 received VC funding from Bain Capital.[5] January 2014, Greg Luck (original developer of Ehcache) joined Hazelcast as CTO, previously having been at Software AG's Terracotta, Inc.[6]

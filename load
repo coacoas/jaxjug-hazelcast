@@ -6,5 +6,5 @@ m.put(5, "Charlottesville")
 try { 
   m.put(6, "Constantinople");
 } catch {
-  case e: Exception => System.out.println(e.getMessage());
+  case e: Exception => System.out.println(e.getMessage()); "ERROR"
 }

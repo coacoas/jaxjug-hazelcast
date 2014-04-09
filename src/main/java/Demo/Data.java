@@ -1,7 +1,6 @@
 package Demo;
 
 import scalacast.Employee;
-import scalacast.Listener;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
@@ -24,6 +23,7 @@ public class Data {
 			ctx.commitTransaction();
 		} catch (Exception e) { 
 			ctx.rollbackTransaction();
+		}
 		
 		IMap<Integer, Employee> e = instance.getMap("employees");
 		e.addEntryListener(new Listener<Integer, Employee>(), new SqlPredicate("age < 18"), false);

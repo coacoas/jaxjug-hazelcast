@@ -3,9 +3,10 @@ package Demo
 import com.hazelcast.core._
 import com.hazelcast.map._
 import java.util.{ Map => JUMap }
+import java.util.concurrent.Callable
 import com.hazelcast.query.SqlPredicate
 
-class Listener[K, V] extends EntryListener[K, V] {
+class Listener[K, V] extends EntryListener[K, V] { 
   override def entryAdded(e: EntryEvent[K, V]) =
     println(s"Added (${e.getKey}, ${e.getValue}")
   override def entryEvicted(e: EntryEvent[K, V]) =
@@ -23,6 +24,13 @@ class ItemsListener[A] extends ItemListener[A] {
     println(s"Removed ${e.getItem()}")
 }
 
+class TestCallable extends Callable[String] with Serializable { 
+  override def call: String = { 
+    println("Running here!")
+    "TestCallable"
+  }
+}
+
 object Implicits {
   class EntryF[K <: AnyRef, V <: AnyRef](val f: (K, V) => V) extends EntryProcessor[K, V]
     with EntryBackupProcessor[K, V] {
@@ -35,6 +43,17 @@ object Implicits {
 
   implicit def toEntryProcessor[K <: AnyRef, V <: AnyRef](f: (K, V) => V): EntryProcessor[K, V] =
     new EntryF(f)
+
+  class CallableF[T](val f: () => T) extends Callable[T] with Serializable { 
+    override def call: T = f()
+  }
+  
+  class MessageListenerF[T](val f: Message[T] => Unit) extends MessageListener[T] { 
+    override def onMessage(message: Message[T]): Unit = f(message)
+  }
+  implicit def toMessageListener[T](f: Message[T] => Unit) = new MessageListenerF(f)
+
+  implicit def toCallable[T](f: () => T): Callable[T] = new CallableF(f)
 
   implicit def toSqlPredicate(s: String) = new SqlPredicate(s)
 

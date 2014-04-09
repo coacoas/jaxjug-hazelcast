@@ -19,6 +19,6 @@ class Query {
 	
 	val expensive: Collection[Employee] = m.values(new SqlPredicate("active=true and salary > 100000"))
 	
-	m.addEntryListener(new Listener[Int, Employee], new SqlPredicate("age < 18"), true)
+//	m.addEntryListener(new Listener[Int, Employee], new SqlPredicate("age < 18"), true)
 	
 }
