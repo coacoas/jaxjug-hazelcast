@@ -113,7 +113,6 @@ public class Lookup {
 
                     </section>
                 </section>
-
                 <section>
                     <section>
                         <h3>But wait, there's more!</h3>
@@ -248,7 +247,6 @@ void removeEntryListener(String id)
                         <ul>
                             <li>Lock</li>
                             <li>Semaphore</li>
-                            <li>Concurrency</li>
                         </ul>
                     </section>
                     <section>
@@ -291,19 +289,134 @@ Map&lt;Member, Future&lt;String>> results =
 
                 <section>
                     <section>
-                        <h3>Extras</h3>
+                        <h3>And even more!</h3>
                         <ul>
+                            <li>Interceptors</li>
+                            <li>Near Cache</li>
                             <li>Hibernate Second Level Cache</li>
                             <li>Spring Integration</li>
                             <li>WAN Replication</li>
                             <li>HTTP Session Clustering</li>
+                            <li>JMX Monitoring</li>
+                            <li>SPI</li>
                         </ul>
                     </section>
-                </section>
+                </section> 
 
                 <section>
                     <section>
-                        <h3>MapReduce</h3>
+                        <h3>Now, in Hazelcast 3.2...</h3>
+                        <h3 class="fragment">Map/Reduce</h3>
+                    </section>
+                    <section>
+                        <h3>Workflow</h3>
+                        <img src="images/mapreduce_workflow_small.png" alt="MapReduce Workflow">
+                    </section>
+                    <section>
+                        <h3>Mapper</h3>
+                        <pre><code class="language-java">
+import java.util.StringTokenizer;
+
+import com.hazelcast.mapreduce.Context;
+import com.hazelcast.mapreduce.Mapper;
+
+public class WordCountMapper implements
+        Mapper&lt;String, String, String, Long> {
+
+    @Override
+    public void map(String key, String value, Context&lt;String, Long> context) {
+        StringTokenizer tokenizer = new StringTokenizer( value.toLowerCase() );
+        while ( tokenizer.hasMoreTokens() ) {
+            context.emit( tokenizer.nextToken(), 1L );
+        }
+    }
+}
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h3>Combiner/CombinerFactory</h3>
+                        <ul>
+                            <li>Optional, but recommended</li>
+                            <li>Used to reduce network traffic</li>
+                            <li>"Intermediate Reducer"</li>
+                            <li>Runs on single node</li>
+                            <li>No locking/volatility required</li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h3>CombinerFactory</h3>
+                        <pre><code>
+import com.hazelcast.mapreduce.Combiner;
+import com.hazelcast.mapreduce.CombinerFactory;
+
+public class WordCountCombinerFactory implements CombinerFactory&lt;String, Long, Long> {
+    @Override
+    public Combiner&lt;String, Long, Long> newCombiner( String key ) {
+        return new WordCountCombiner();
+    }
+
+    private class WordCountCombiner extends Combiner&lt;String, Long, Long> {
+        private long sum = 0;
+
+        @Override
+        public void combine( String key, Long value ) {
+            sum++;
+        }
+
+        @Override
+        public Long finalizeChunk() {
+            long chunk = sum;
+            sum = 0;
+            return chunk;
+        }
+    }
+}
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h3>Reducer</h3>
+                        <pre><code>
+import com.hazelcast.mapreduce.Reducer;
+import com.hazelcast.mapreduce.ReducerFactory;
+
+public class WordCountReducerFactory implements ReducerFactory&lt;String, Long, Long> {
+    @Override
+    public Reducer&lt;String, Long, Long> newReducer( String key ) {
+        return new WordCountReducer();
+    }
+
+    private class WordCountReducer extends Reducer&lt;String, Long, Long> {
+        private volatile long sum = 0;
+
+        @Override
+        public void reduce( Long value ) {
+            sum += value.longValue();
+        }
+
+        @Override
+        public Long finalizeReduce() {
+            return sum;
+        }
+    }
+}
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h3>Put it all together</h3>
+                        <pre><code class="language-java">
+HazelcastInstance instance = Hazelcast.newHazelcastInstance();
+JobTracker tracker = instance.getJobTracker("word-count");
+IMap&lt;String, String> data = instance.getMap("data");
+KeyValueSource&lt;String, String> source = KeyValueSource.fromMap(data);
+Job&lt;String, String> job = tracker.newJob(source);
+
+JobCompletableFuture&lt;Map&lt;String, Long>> future = 
+        job.mapper(new WordCountMapper()).
+            combiner(new WordCountCombinerFactory()).
+            reducer(new WordCountReducerFactory()).
+            submit();
+Map&lt;String, Long> result = future.get();
+                        </code></pre>
                     </section>
                 </section>
 
@@ -322,6 +435,7 @@ Map&lt;Member, Future&lt;String>> results =
                     <section>
                         <h3>All Open Source</h3>
                         <p>Licensed using Apache 2.0</p>
+                        <p class="fragment">Contained in a 2.6MB JAR</p>
                     </section>
                 </section>
 
@@ -388,17 +502,20 @@ m.executeOnKey(1, new AbstractProcessor&lt;Integer, String>() {
                     </section>
                 </section>
 
+                <!--
                 <section>
                     <section>
-                        <h3>Demo</h3>
+                        <h1>Demo</h1>
                     </section>
                 </section>
+                -->
                 <section>
                     <section>
                         <h3>There is a <i>little</i> more...</h3>
                         <div class="fragment">
                             <p>Enterprise capabilities ($$$)
                             <ul>
+                                <li>Management Console</li>
                                 <li>Security</li>
                                 <li>Elastic Memory</li>
                                 <li>C# Client</li>
@@ -408,7 +525,28 @@ m.executeOnKey(1, new AbstractProcessor&lt;Integer, String>() {
                         </div>
                     </section>
                 </section>
-
+                <section>
+                    <section>
+                        <h3>Use Cases</h3>
+                        <p>Use Hazelcast for:</p>
+                        <ul>
+                            <li>NoSQL KV Store</li>
+                            <li>Messaging</li>
+                            <li>Data Grid</li>
+                            <li>Caching</li>
+                            <li>Application Scaling</li>
+                            <li>Clustering</li>
+                        </ul>
+                    </section>
+                </section>
+                <section>
+                    <section>
+                        <h3>Webinar</h3>
+                        <p>Learn How To Speed Up Your Database With Hazelcast</p>
+                        <a href="http://www.hazelcast.org/webinars/learn-how-to-speed-up-your-database-with-hazelcast/">http://www.hazelcast.org/webinars/learn-how-to-speed-up-your-database-with-hazelcast/</a>
+                        <p>Wednesday, April 16th, 2014 — 1:00 PM EDT</p>
+                    </section>
+                </section>
                 <section>
                     <section>
                         <h1>?</h1>
